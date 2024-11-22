@@ -1,4 +1,5 @@
-import { getCartList, changeCount } from '@/api/cart'
+import { getCartList, changeCount, delSelect } from '@/api/cart'
+import { Toast } from 'vant'
 
 export default {
     namespaced: true,
@@ -42,6 +43,14 @@ export default {
                 value
             })
             await changeCount(goodsId, value, skuId)
+        },
+        // 删除购物车数据
+        async delSelect(context) {
+            const selCartList = context.getters.selCartList
+            const cartIds = selCartList.map(item => item.id)
+            await delSelect(cartIds)
+            Toast('删除成功')
+            context.dispatch('getCartAction')
         }
     },
     getters: {
