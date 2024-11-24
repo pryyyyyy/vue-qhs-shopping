@@ -33,8 +33,7 @@
             <div class="list">
                 <div class="goods-item" v-for="item in order.goodsList" :key="item.goods_id">
                     <div class="left">
-                        <img :src="item.goods_image"
-                            alt="" />
+                        <img :src="item.goods_image" alt="" />
                     </div>
                     <div class="right">
                         <p class="tit text-ellipsis-2">
@@ -83,28 +82,29 @@
 
             <!-- 买家留言 -->
             <div class="buytips">
-                <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10"></textarea>
+                <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10" v-model="remark"></textarea>
             </div>
         </div>
 
         <!-- 底部提交 -->
         <div class="footer-fixed">
             <div class="left">实付款：<span>￥{{ order.orderTotalPrice }}</span></div>
-            <div class="tipsbtn">提交订单</div>
+            <div class="tipsbtn" @click="submitOrder">提交订单</div>
         </div>
     </div>
 </template>
 
 <script>
 import { getAddressList } from '@/api/pay'
-import { checkOrder } from '@/api/order'
+import { checkOrder, submitOrder } from '@/api/order'
 export default {
     name: 'PayIndex',
     data() {
         return {
             addressList: [],
             order: {},
-            personal: {}
+            personal: {},
+            remark: '' // 买家留言
         }
     },
     computed: {
@@ -156,6 +156,25 @@ export default {
                 this.order = order
                 this.personal = personal
             }
+        },
+        // 提交订单
+        async submitOrder() {
+            if (this.mode === 'cart') {
+                await submitOrder(this.mode, {
+                    remark: this.remark,
+                    cartIds: this.cartIds
+                })
+            }
+            if (this.mode === 'buyNow') {
+                await submitOrder(this.mode, {
+                    remark: this.remark,
+                    goodsId: this.goodsId,
+                    goodsSkuId: this.goodsSkuId,
+                    goodsNum: this.goodsNum
+                })
+            }
+            this.$toast.success('支付成功')
+            this.$router.replace('/myorder')
         }
     }
 }
